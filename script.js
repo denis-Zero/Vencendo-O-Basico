@@ -7,8 +7,11 @@ const logoutBtn = document.getElementById('logoutBtn');
 const addHabitBtn = document.getElementById('addHabitBtn');
 
 let currentUser = null;
+let isNewUser = false;
 
-// LOGIN / CADASTRO
+/* =========================
+   LOGIN / CADASTRO
+========================= */
 loginBtn.onclick = () => {
   const user = username.value.trim();
   const email = document.getElementById('email').value.trim();
@@ -20,8 +23,8 @@ loginBtn.onclick = () => {
   }
 
   let users = JSON.parse(localStorage.getItem('users')) || {};
+  isNewUser = false;
 
-  // Se for um novo usuário, cria agora
   if (!users[user]) {
     users[user] = {
       email,
@@ -29,11 +32,12 @@ loginBtn.onclick = () => {
       createdAt: new Date().toISOString(),
       habits: []
     };
+    isNewUser = true; // 🔑 usuário acabou de nascer
   }
 
-  currentUser = user;
   localStorage.setItem('users', JSON.stringify(users));
   localStorage.setItem('session', user);
+  currentUser = user;
 
   loadApp();
 };
@@ -43,26 +47,31 @@ logoutBtn.onclick = () => {
   location.reload();
 };
 
-// CARREGAMENTO DO APP
+/* =========================
+   LOAD APP
+========================= */
 function loadApp() {
   auth.classList.add('hidden');
   dashboard.classList.remove('hidden');
-  paywall.classList.add('hidden'); // garante que começa oculto
+  paywall.classList.add('hidden'); // 🔒 SEMPRE começa oculto
 
-  checkTrial();
+  // ⚠️ usuário novo NÃO passa por trial
+  if (!isNewUser) {
+    checkTrial();
+  }
+
   renderHabits();
 }
 
-// TRIAL DE 7 DIAS (corrigido)
+/* =========================
+   TRIAL 7 DIAS (BLINDADO)
+========================= */
 function checkTrial() {
   const users = JSON.parse(localStorage.getItem('users'));
   const userData = users[currentUser];
 
-  if (!userData.createdAt) {
-    userData.createdAt = new Date().toISOString();
-    localStorage.setItem('users', JSON.stringify(users));
-    return;
-  }
+  // segurança absoluta
+  if (!userData || !userData.createdAt) return;
 
   const created = new Date(userData.createdAt);
   const today = new Date();
@@ -71,13 +80,14 @@ function checkTrial() {
     (today - created) / (1000 * 60 * 60 * 24)
   );
 
-  // Só bloqueia após o 7º dia COMPLETO
   if (diffDays >= 7) {
     paywall.classList.remove('hidden');
   }
 }
 
-// HÁBITOS
+/* =========================
+   HÁBITOS
+========================= */
 addHabitBtn.onclick = () => {
   const input = document.getElementById('habitInput');
   if (!input.value.trim()) return;
@@ -98,6 +108,8 @@ function renderHabits() {
   list.innerHTML = '';
 
   const users = JSON.parse(localStorage.getItem('users'));
+  if (!users[currentUser]) return;
+
   users[currentUser].habits.forEach((habit, index) => {
     const li = document.createElement('li');
     li.className = habit.done ? 'done' : '';
@@ -114,14 +126,23 @@ function renderHabits() {
 
 function toggleHabit(index) {
   const users = JSON.parse(localStorage.getItem('users'));
-  users[currentUser].habits[index].done = !users[currentUser].habits[index].done;
+  users[currentUser].habits[index].done =
+    !users[currentUser].habits[index].done;
+
   localStorage.setItem('users', JSON.stringify(users));
   renderHabits();
 }
 
-// AUTO LOGIN
+/* =========================
+   AUTO LOGIN (VALIDADO)
+========================= */
 const session = localStorage.getItem('session');
-if (session) {
+const users = JSON.parse(localStorage.getItem('users'));
+
+if (session && users && users[session]) {
   currentUser = session;
+  isNewUser = false;
   loadApp();
+} else {
+  localStorage.removeItem('session'); // limpa sessão inválida
 }
