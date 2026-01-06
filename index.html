@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Vencendo o Básico</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Habit tracker minimalista para vencer o básico todos os dias.">
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <main class="app">
+
+    <!-- LOGIN / CADASTRO -->
+    <section id="auth" class="card">
+      <h1>Vencendo o Básico</h1>
+      <p class="subtitle">Pequenos hábitos. Todos os dias.</p>
+
+      <input type="text" id="username" placeholder="Usuário">
+      <input type="email" id="email" placeholder="Email">
+      <input type="password" id="password" placeholder="Senha">
+
+      <button id="loginBtn">Entrar / Criar Conta</button>
+    </section>
+
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="hidden">
+      <header>
+        <h2>Seus Hábitos</h2>
+        <button id="logoutBtn">Sair</button>
+      </header>
+
+      <div class="add-habit">
+        <input type="text" id="habitInput" placeholder="Ex: Ler">
+        <button id="addHabitBtn">Adicionar</button>
+      </div>
+
+      <ul id="habitList"></ul>
+    </section>
+
+    <!-- OVERLAY ASSINATURA -->
+    <section id="paywall" class="overlay hidden">
+      <div class="paywall-content">
+        <h2>Mantenha a jornada viva</h2>
+        <p>Você venceu o básico por 7 dias.<br>Continue evoluindo com acesso completo.</p>
+        <strong>R$ 4,99 / mês</strong>
+        <button>Assinar agora</button>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
